@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_explode_dart/youtube_explode_dart.dart';
+import 'package:youtube_explode_dart/src/videos/video.dart';
+
 import 'package:limited_tube/models/video_item.dart';
 
 /// Simple State Management to hold playlist links and mock data
@@ -25,12 +28,28 @@ class YoutubeManager extends ChangeNotifier {
 
   /// In a real app, this would call the YouTube Data API v3
   /// Here we generate mock data based on the presence of playlists
-  void _syncFeed() {
+  Future<void> _syncFeed() async {
     if (_playlistLinks.isEmpty) {
       _feedItems = [];
     } else {
+      final sampleURL = 'PLQxbZDjEGGkmGROBWOtG_K-2sc6wAZfVi'; //DCE's let's code
+      final _videos = await _get_playlist_feed(sampleURL);
+      print('COUNT: ${_videos.length}');
+      _feedItems = List.generate(_videos.length, (idx) {
+        bool isShort = false;
+        return VideoItem(
+          id: '${_videos[idx].id}',
+          title: '${_videos[idx].title}',
+          author: '${_videos[idx].author}',
+          views: '${(idx + 1) * 12}K views',
+          thumbnail: '${_videos[idx].thumbnails.standardResUrl}',
+          //'https://picsum.photos/seed/yt$idx/600/350',
+          isShort: isShort,
+        );
+      });
+
       // Mocking different content types for the UI
-      _feedItems = List.generate(_playlistLinks.length * 3, (index) {
+      _feedItems += List.generate(_playlistLinks.length * 3, (index) {
         bool isShort = index % 3 == 0;
         return VideoItem(
           id: 'v$index',
@@ -44,5 +63,14 @@ class YoutubeManager extends ChangeNotifier {
         );
       });
     }
+  }
+
+  Future<List<Video>> _get_playlist_feed(url) async {
+    var yt = YoutubeExplode();
+    var pls = await yt.playlists.get(url);
+    print("[+] ${pls.title} by ${pls.author}");
+    print("\t${pls.description}\n\t${pls.videoCount} videos");
+
+    return yt.playlists.getVideos(pls.id).toList();
   }
 }
