@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:limited_tube/controllers/youtube_manager.dart';
 import 'package:limited_tube/models/video_item.dart';
@@ -14,10 +15,17 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Image.network(
-          'https://upload.wikimedia.org/wikipedia/commons/b/b8/YouTube_Logo_2017.svg',
-          height: 20,
-          errorBuilder: (context, error, stackTrace) => const Text('YouTube'),
+        title: Text(
+          'LimeTube',
+          style: GoogleFonts.roboto(
+            // Use a specific font, e.g., Lato
+            textStyle: const TextStyle(
+              color: Colors.white,
+              letterSpacing: .5,
+            ), // Add custom style properties
+            fontSize: 20,
+            fontWeight: FontWeight.w300,
+          ),
         ),
         backgroundColor: Colors.black,
         actions: [
