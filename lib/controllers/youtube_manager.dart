@@ -36,6 +36,7 @@ class YoutubeManager extends ChangeNotifier {
       final _videos = await _get_playlist_feed(sampleURL);
       print('COUNT: ${_videos.length}');
       _feedItems = List.generate(_videos.length, (idx) {
+        print("Video id: ${_videos[idx].url}");
         bool isShort = false;
         return VideoItem(
           id: '${_videos[idx].id}',
