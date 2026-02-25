@@ -11,9 +11,25 @@ class YoutubeManager extends ChangeNotifier {
 
   List<String> get playlistLinks => _playlistLinks;
   List<VideoItem> get feedItems => _feedItems;
+  final String ytPlaylistUrlPrefix = "https://www.youtube.com/playlist?list=";
+
+  bool isValidUrl(String urlString) {
+    Uri? uri = Uri.tryParse(urlString);
+    if (uri == null) {
+      uri = Uri.tryParse(ytPlaylistUrlPrefix + urlString);
+      if (uri == null) return false;
+    }
+    if (uri.scheme != 'http' && uri.scheme != 'https') {
+      return false;
+    } else if (uri.host.isEmpty) {
+      return false;
+    }
+    return true;
+  }
 
   void addPlaylist(String url) {
     if (url.isNotEmpty && !_playlistLinks.contains(url)) {
+      if (!isValidUrl(url)) return;
       _playlistLinks.add(url);
       _syncFeed();
       notifyListeners();
@@ -32,7 +48,8 @@ class YoutubeManager extends ChangeNotifier {
     if (_playlistLinks.isEmpty) {
       _feedItems = [];
     } else {
-      final sampleURL = 'PLQxbZDjEGGkmGROBWOtG_K-2sc6wAZfVi'; //DCE's let's code
+      final sampleURL = _playlistLinks
+          .last; // 'PLQxbZDjEGGkmGROBWOtG_K-2sc6wAZfVi'; //DCE's let's code
       final _videos = await _get_playlist_feed(sampleURL);
       print('COUNT: ${_videos.length}');
       _feedItems = List.generate(_videos.length, (idx) {
